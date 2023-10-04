@@ -10,7 +10,23 @@
     color(x, y): x is colored y
 */
 
-:- discontiguous has/2.
+:- discontiguous color/2, has/2.
+
+% stretch
+has(stretch, hair).
+has(stretch, long_legs).
+has(stretch, long_neck).
+has(stretch, dark_spots).
+chews_cud(stretch).
+color(stretch, tawny).
+
+% swifty
+has(swifty, hair).
+has(swifty, pointed_teeth).
+has(swifty, claws).
+has(swifty, forward_pointing_eyes).
+has(swifty, dark_spots).
+color(swifty, tawny).
 
 isa(X, mammal):- has(X, hair).
 isa(X, mammal):- has(X, milk).
@@ -32,22 +48,8 @@ isa(X, giraffe):- isa(X, ungulate), has(X, long_legs), has(X, long_neck), color(
 
 isa(X, zebra):- isa(X, ungulate), color(X, white), has(X, black_stripes).
 
-isa(X, ostrich):- isa(X, bird), \+flies(X), has(x, long_legs), color(X, black), color(X, white).
+isa(X, ostrich):- isa(X, bird), not(flies(X)), has(x, long_legs), color(X, black), color(X, white).
 
-isa(X, penguin):- isa(X, bird), \+flies(X), swims(X), color(X, black), color(X, white).
+isa(X, penguin):- isa(X, bird), not(flies(X)), swims(X), color(X, black), color(X, white).
 
 isa(X, albatross):- isa(X, bird), good_flier(X).
-
-has(stretch, hair).
-has(stretch, long_legs).
-has(stretch, long_neck).
-has(stretch, dark_spots).
-chews_cud(stretch).
-color(x, tawny).
-
-has(swifty, hair).
-has(swifty, pointed_teeth).
-has(swifty, claws).
-has(swifty, forward_pointing_eyes).
-has(swifty, tawny).
-has(swifty, dark_spots).
