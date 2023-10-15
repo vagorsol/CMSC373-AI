@@ -54,7 +54,7 @@ public class Board {
         // determine direction
         if (colStart == colEnd) {
             // move vertically
-            if (rowEnd - rowStart < 2 
+            if (Math.abs(rowEnd - rowStart) < 2 
                 || board[rowStart][colStart].equals(board[rowStart + 1][colStart]) 
                 || board[rowStart + 1][colStart].equals(".")) {
                 return false;
@@ -62,7 +62,7 @@ public class Board {
            
         } else if (rowStart == rowEnd){
             // move horizontally
-            if (colEnd - colStart < 2
+            if (Math.abs(colEnd - colStart) < 2
                 || board[rowStart][colStart].equals(board[rowStart][colStart + 1]) 
                 || board[rowStart][colStart + 1].equals(".")) {
                 return false;
@@ -80,35 +80,34 @@ public class Board {
      */
     public boolean movePiece(int[] rowMoves, int[] colMoves) {
         // catch cases where the move inputs aren't right
+        System.out.println(rowMoves.length);
         if (rowMoves.length < 2 || colMoves.length < 2 || rowMoves.length != colMoves.length) {
             return false;
         }
 
         boolean moveVertically = false;
-        if(rowMoves[0] == rowMoves[1]) {
+        if(colMoves[0] == colMoves[1]) {
             moveVertically = true;
         }
-
+       
         // check that all moves are legal
         for (int i = 0; i < rowMoves.length - 1; i++) {
             // verify that the moves are in the same direction 
-            // TODO: check the logic of this
             if (moveVertically) {
-                if (colMoves[i] != colMoves[i + 1]) { 
+                if (rowMoves[i] == rowMoves[i + 1]) {
+                    return false; 
+                } else if(i > 1 && i < rowMoves.length - 1) {
+                    if (!(rowMoves[i - 1] < rowMoves[i] && rowMoves[i] < rowMoves[i + 1])
+                    && !(rowMoves[i - 1] > rowMoves[i] && rowMoves[i] > rowMoves[i + 1])) {
+                        return false;
+                    }
+                }
+            } else if (!moveVertically) {
+                if (colMoves[i] == colMoves[i + 1]) { 
                     return false; 
                 } else if (i > 1 && i < rowMoves.length - 1) {
                     if (!(colMoves[i - 1] < colMoves[i] && colMoves[i] < colMoves[i + 1])
                     && !(colMoves[i - 1] > colMoves[i] && colMoves[i] > colMoves[i + 1])) {
-                        return false;
-                    }
-                }
-    
-            } else if (!moveVertically) {
-                if (rowMoves[i] != rowMoves[i + 1]) {
-                    return false; 
-                } else if(i > 1 && i < rowMoves.length - 1){
-                    if (!(rowMoves[i - 1] < rowMoves[i] && rowMoves[i] < rowMoves[i + 1])
-                    && !(rowMoves[i - 1] > rowMoves[i] && rowMoves[i] > rowMoves[i + 1])) {
                         return false;
                     }
                 }
@@ -119,17 +118,22 @@ public class Board {
             }
         }
 
+        // TODO: figure out math of the inbetween piece
         // if all of the moves are legal, make the moves and return new board state
         for (int i = 0; i < rowMoves.length - 1; i++) {
             // execute the moves here 
             if (moveVertically) {
+                int indxBetween = (rowMoves[i + 1] - rowMoves[i]) / 2;
+
+                board[rowMoves[i + 1]][colMoves[i ]] = board[rowMoves[i]][colMoves[i]];
+                board[rowMoves[i] + indxBetween][colMoves[i]] = ".";
+                board[rowMoves[i]][colMoves[i]] = ".";    
+            } else {
+                int indxBetween = (colMoves[i + 1] - colMoves[i]) / 2;
+
                 board[rowMoves[i]][colMoves[i + 1]] = board[rowMoves[i]][colMoves[i]];
                 board[rowMoves[i]][colMoves[i]] = ".";
-                board[rowMoves[i]][colMoves[i] + 1] = ".";    
-            } else {
-                board[rowMoves[i + 1]][colMoves[i]] = board[rowMoves[i]][colMoves[i]];
-                board[rowMoves[i]][colMoves[i]] = ".";
-                board[rowMoves[i] + 1][colMoves[i]] = ".";    
+                board[rowMoves[i] ][colMoves[i] + indxBetween] = ".";    
             }
         }
         return true;
