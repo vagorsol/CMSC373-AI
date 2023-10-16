@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Board {
     public String[][] board;
     private int legalMoves;
@@ -49,8 +51,8 @@ public class Board {
      * @return true iff the move is legal
      */
     private boolean legalMove(int rowStart, int colStart, int rowEnd, int colEnd, String[][] boardState) {
-        System.out.println("(" + rowStart + "," + colStart + ") to " + "(" + rowEnd + "," + colEnd + ")");
-        printBoard();
+        // System.out.println("(" + rowStart + "," + colStart + ") to " + "(" + rowEnd + "," + colEnd + ")");
+        // printBoard();
         // check that the start/endpoints are in-bounds
         if (rowStart <= 0 || rowStart > 8 || colStart <= 0 || colStart > 8
             || rowEnd <= 0 || rowEnd > 8 || colEnd <= 0 || colEnd > 8) {
@@ -64,10 +66,10 @@ public class Board {
         // determine direction
         if (colStart == colEnd) {
             int indxBetween = (rowEnd - rowStart) / 2;
-
+            // System.out.println(rowStart + indxBetween);
             // move vertically
             if (Math.abs(rowEnd - rowStart) < 2 
-                || board[rowStart][colStart].equals(board[rowStart + 1][colStart]) 
+                || board[rowStart][colStart].equals(board[rowStart + indxBetween][colStart]) 
                 || board[rowStart + indxBetween][colStart].equals(".")) {
                 return false;
             }
@@ -76,7 +78,7 @@ public class Board {
             int indxBetween = (colEnd - colStart) / 2;
             // move horizontally
             if (Math.abs(colEnd - colStart) < 2
-                || board[rowStart][colStart].equals(board[rowStart][colStart + 1]) 
+                || board[rowStart][colStart].equals(board[rowStart][colStart + indxBetween]) 
                 || board[rowStart][colStart + indxBetween].equals(".")) {
                 return false;
             }
@@ -134,7 +136,7 @@ public class Board {
                 if (moveVertically) {
                     int indxBetween = (rowMoves[i + 1] - rowMoves[i]) / 2;
 
-                    board[rowMoves[i + 1]][colMoves[i ]] = board[rowMoves[i]][colMoves[i]];
+                    board[rowMoves[i + 1]][colMoves[i]] = board[rowMoves[i]][colMoves[i]];
                     board[rowMoves[i] + indxBetween][colMoves[i]] = ".";
                     board[rowMoves[i]][colMoves[i]] = ".";    
                 } else {
@@ -149,23 +151,107 @@ public class Board {
 
         // if all of the moves are legal, make the moves and return new board state
         board = testBoard;
-        // for (int i = 0; i < rowMoves.length - 1; i++) {
-        //     // execute the moves here 
-        //     if (moveVertically) {
-        //         int indxBetween = (rowMoves[i + 1] - rowMoves[i]) / 2;
-
-        //         board[rowMoves[i + 1]][colMoves[i ]] = board[rowMoves[i]][colMoves[i]];
-        //         board[rowMoves[i] + indxBetween][colMoves[i]] = ".";
-        //         board[rowMoves[i]][colMoves[i]] = ".";    
-        //     } else {
-        //         int indxBetween = (colMoves[i + 1] - colMoves[i]) / 2;
-
-        //         board[rowMoves[i]][colMoves[i + 1]] = board[rowMoves[i]][colMoves[i]];
-        //         board[rowMoves[i]][colMoves[i]] = ".";
-        //         board[rowMoves[i] ][colMoves[i] + indxBetween] = ".";    
-        //     }
-        // }
         return true;
+    }
+
+    /**
+     * Finds all the possible (legal) moves on the board for a given side and then finds them
+     * probably make it private later but. make some kind of list (ArrayList?) of all the legal moves, and then pick one from it
+     * @param side 
+     */
+    public ArrayList<int[][]> allLegalMoves(String side) {
+        Board testBoard = new Board(this.board);
+
+        ArrayList<int[][]> allMoves = new ArrayList<int[][]>(); // how best to represent this?
+
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                if (!board[i][j].equals(side)) {
+                    continue;
+                }
+
+                ArrayList<Integer> rowMoves, colMoves;
+                
+                // check all vertical moves
+                for (int k = -2; k <= 2; k += 4) {
+                    rowMoves = new ArrayList<>();
+                    colMoves = new ArrayList<>();
+                    rowMoves.add(i);
+                    colMoves.add(j);
+                    int index = k;
+
+                    // add second point
+                    rowMoves.add(i);
+                    if (k < 0) {
+                        colMoves.add(j - 2);
+                    } else {
+                        colMoves.add(j + 2);
+                    }
+                    
+                    while (true) {
+                        int[] arrRowMoves = toArray(rowMoves);
+                        int[] arrColMoves = toArray(colMoves);
+
+                        if (testBoard.movePiece(arrRowMoves, arrColMoves)) {
+                            int[][] toAdd ={arrRowMoves, arrColMoves};
+                            allMoves.add(toAdd);
+                            rowMoves.add(i);
+                            colMoves.add(j + index);
+                            index += k;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+
+                // check all horizontal moves
+                for (int k = -2; k <= 2; k += 4) {
+                    rowMoves = new ArrayList<>();
+                    colMoves = new ArrayList<>();
+                    rowMoves.add(i);
+                    colMoves.add(j);
+                    int index = k;
+
+                    // add second point
+                    colMoves.add(j);
+                    if (k < 0) {
+                        rowMoves.add(j - 2);
+                    } else {
+                        rowMoves.add(j + 2);
+                    }
+
+                    while (true) {
+                        int[] arrRowMoves = toArray(rowMoves);
+                        int[] arrColMoves = toArray(colMoves);
+
+                        if (testBoard.movePiece(arrRowMoves, arrColMoves)) {
+                            int[][] toAdd ={arrRowMoves, arrColMoves};
+                            allMoves.add(toAdd);
+                            rowMoves.add(i + index);
+                            colMoves.add(j);
+                            index += k;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+            } 
+        }
+       
+        return allMoves;
+    }
+
+    /**
+     * Give an ArrayList, convert it to an array
+     * @param lst - the ArrayList to convert
+     * @return ret - the ArrayList converted to an array
+     */
+    private int[] toArray(ArrayList<Integer> lst) {
+        int[] retArr = new int[lst.size()];
+        for (int i = 0; i < lst.size(); i++) {
+            retArr[i] = lst.get(i);
+        }
+        return retArr; 
     }
 
     /**

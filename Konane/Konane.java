@@ -1,10 +1,12 @@
+import java.util.ArrayList;
+
 public class Konane {
 
     public static void main(String args[]) {
 
         Board board = new Board();
         
-        // board.printBoard();
+        board.printBoard();
 
         board.board[4][4] = ".";
         board.board[2][4] = ".";
@@ -19,6 +21,8 @@ public class Konane {
             System.out.println("Illegal Move!");
         }
 
+        ArrayList<int[][]> moves = board.allLegalMoves("O");
+        System.out.print(moves.size());
         /*
          * TODO: 
          *      decide who moves first (player or computer) - function that is 
