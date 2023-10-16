@@ -105,7 +105,7 @@ public class Board {
         }
         
         // check that all moves are legal
-        String[][] testBoard = board;
+        String[][] testBoard = this.board;
 
         for (int i = 0; i < rowMoves.length - 1; i++) {
             // verify that the moves are in the same direction 
@@ -150,7 +150,7 @@ public class Board {
         }
 
         // if all of the moves are legal, make the moves and return new board state
-        board = testBoard;
+        this.board = testBoard;
         return true;
     }
 
@@ -160,9 +160,11 @@ public class Board {
      * @param side 
      */
     public ArrayList<int[][]> allLegalMoves(String side) {
-        Board testBoard = new Board(this.board);
+        String[][] saveState = copy(board);
+        
+        // Board testBoard = new Board(board); 
 
-        ArrayList<int[][]> allMoves = new ArrayList<int[][]>(); // how best to represent this?
+        ArrayList<int[][]> allMoves = new ArrayList<int[][]>();
 
         for (int i = 1; i < 9; i++) {
             for (int j = 1; j < 9; j++) {
@@ -192,12 +194,13 @@ public class Board {
                         int[] arrRowMoves = toArray(rowMoves);
                         int[] arrColMoves = toArray(colMoves);
 
-                        if (testBoard.movePiece(arrRowMoves, arrColMoves)) {
+                        if (movePiece(arrRowMoves, arrColMoves)) {
                             int[][] toAdd ={arrRowMoves, arrColMoves};
                             allMoves.add(toAdd);
                             rowMoves.add(i);
                             colMoves.add(j + index);
                             index += k;
+                            board = copy(saveState); // have to reset the board every time...
                         } else {
                             break;
                         }
@@ -224,12 +227,13 @@ public class Board {
                         int[] arrRowMoves = toArray(rowMoves);
                         int[] arrColMoves = toArray(colMoves);
 
-                        if (testBoard.movePiece(arrRowMoves, arrColMoves)) {
+                        if (movePiece(arrRowMoves, arrColMoves)) {
                             int[][] toAdd ={arrRowMoves, arrColMoves};
                             allMoves.add(toAdd);
                             rowMoves.add(i + index);
                             colMoves.add(j);
                             index += k;
+                            board = copy(saveState);
                         } else {
                             break;
                         }
@@ -238,6 +242,25 @@ public class Board {
             } 
         }
        
+        // System.out.println("Test board");
+        // testBoard.printBoard();
+
+        // System.out.println("Save State");
+        // for (int i = 0; i < 9; i++) {
+
+        //     if (i == 1) System.out.println();
+
+        //     for (int j = 0; j < 9; j++) {
+        //         System.out.print(saveState[i][j] + " ");
+
+        //         if (j == 0) {System.out.print(" ");}
+        //         if (j == 8) {System.out.println();}
+        //     }
+        // }
+        // // System.out.println();
+        // printBoard();
+        board = copy(saveState);
+        // printBoard();
         return allMoves;
     }
 
@@ -254,6 +277,18 @@ public class Board {
         return retArr; 
     }
 
+
+    private String[][] copy(String[][] board) {
+        String[][] retBoard = new String[9][9];
+
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                retBoard[i][j] = board[i][j];
+            }
+        }
+
+        return retBoard;
+    }
     /**
      * Given a board, print out its contents
      * @param board to print
