@@ -4,12 +4,14 @@ public class Konane {
 
         Board board = new Board();
         
-        board.printBoard();
+        // board.printBoard();
 
         board.board[4][4] = ".";
+        board.board[2][4] = ".";
         board.printBoard();
-        int[] rowMoves = {6, 4};
-        int[] colMoves = {4, 4};
+        int[] rowMoves = {6, 4, 2};
+        int[] colMoves = {4, 4, 4};
+
 
         if(board.movePiece(rowMoves, colMoves)) {
             board.printBoard();

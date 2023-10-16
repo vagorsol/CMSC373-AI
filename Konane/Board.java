@@ -1,5 +1,6 @@
 public class Board {
     public String[][] board;
+    private int legalMoves;
 
     public Board(){
         // create and innit a new board
@@ -20,6 +21,12 @@ public class Board {
                 }
             }
         }
+
+        legalMoves = 0;
+    }
+
+    public Board(String[][] board) {
+        this.board = board;
     }
 
     /**
@@ -28,43 +35,49 @@ public class Board {
      * @param col
      * @return true iff the tile has no piece
      */
-    private boolean isFree(int row, int col) {
+    private boolean isFree(int row, int col, String[][] boardState) {
         if(board[row][col].equals(".")) {
             return true;
         }
         return false;
     }
+
     /**
      * Given a set of moves a player would like to make, check to see if the moves are 
      * legal in the given board state
      * @param board - the current state of the board
      * @return true iff the move is legal
      */
-    private boolean legalMove(int rowStart, int colStart, int rowEnd, int colEnd) {
+    private boolean legalMove(int rowStart, int colStart, int rowEnd, int colEnd, String[][] boardState) {
+        System.out.println("(" + rowStart + "," + colStart + ") to " + "(" + rowEnd + "," + colEnd + ")");
+        printBoard();
         // check that the start/endpoints are in-bounds
         if (rowStart <= 0 || rowStart > 8 || colStart <= 0 || colStart > 8
             || rowEnd <= 0 || rowEnd > 8 || colEnd <= 0 || colEnd > 8) {
             return false;
         }
         // check is the target space free and that there is a piece at the start
-        if (!isFree(rowEnd, colEnd) || isFree(rowStart, colStart)) {
+        if (!isFree(rowEnd, colEnd, boardState) || isFree(rowStart, colStart, boardState)) {
             return false;
         }
 
         // determine direction
         if (colStart == colEnd) {
+            int indxBetween = (rowEnd - rowStart) / 2;
+
             // move vertically
             if (Math.abs(rowEnd - rowStart) < 2 
                 || board[rowStart][colStart].equals(board[rowStart + 1][colStart]) 
-                || board[rowStart + 1][colStart].equals(".")) {
+                || board[rowStart + indxBetween][colStart].equals(".")) {
                 return false;
             }
            
         } else if (rowStart == rowEnd){
+            int indxBetween = (colEnd - colStart) / 2;
             // move horizontally
             if (Math.abs(colEnd - colStart) < 2
                 || board[rowStart][colStart].equals(board[rowStart][colStart + 1]) 
-                || board[rowStart][colStart + 1].equals(".")) {
+                || board[rowStart][colStart + indxBetween].equals(".")) {
                 return false;
             }
         } 
@@ -80,7 +93,6 @@ public class Board {
      */
     public boolean movePiece(int[] rowMoves, int[] colMoves) {
         // catch cases where the move inputs aren't right
-        System.out.println(rowMoves.length);
         if (rowMoves.length < 2 || colMoves.length < 2 || rowMoves.length != colMoves.length) {
             return false;
         }
@@ -89,8 +101,10 @@ public class Board {
         if(colMoves[0] == colMoves[1]) {
             moveVertically = true;
         }
-       
+        
         // check that all moves are legal
+        String[][] testBoard = board;
+
         for (int i = 0; i < rowMoves.length - 1; i++) {
             // verify that the moves are in the same direction 
             if (moveVertically) {
@@ -113,29 +127,44 @@ public class Board {
                 }
             }
 
-            if (!legalMove(rowMoves[i], colMoves[i], rowMoves[i + 1], colMoves[i + 1])) {
+            if (!legalMove(rowMoves[i], colMoves[i], rowMoves[i + 1], colMoves[i + 1], testBoard)) {
                 return false;
-            }
-        }
-
-        // TODO: figure out math of the inbetween piece
-        // if all of the moves are legal, make the moves and return new board state
-        for (int i = 0; i < rowMoves.length - 1; i++) {
-            // execute the moves here 
-            if (moveVertically) {
-                int indxBetween = (rowMoves[i + 1] - rowMoves[i]) / 2;
-
-                board[rowMoves[i + 1]][colMoves[i ]] = board[rowMoves[i]][colMoves[i]];
-                board[rowMoves[i] + indxBetween][colMoves[i]] = ".";
-                board[rowMoves[i]][colMoves[i]] = ".";    
             } else {
-                int indxBetween = (colMoves[i + 1] - colMoves[i]) / 2;
+                // execute the moves here 
+                if (moveVertically) {
+                    int indxBetween = (rowMoves[i + 1] - rowMoves[i]) / 2;
 
-                board[rowMoves[i]][colMoves[i + 1]] = board[rowMoves[i]][colMoves[i]];
-                board[rowMoves[i]][colMoves[i]] = ".";
-                board[rowMoves[i] ][colMoves[i] + indxBetween] = ".";    
+                    board[rowMoves[i + 1]][colMoves[i ]] = board[rowMoves[i]][colMoves[i]];
+                    board[rowMoves[i] + indxBetween][colMoves[i]] = ".";
+                    board[rowMoves[i]][colMoves[i]] = ".";    
+                } else {
+                    int indxBetween = (colMoves[i + 1] - colMoves[i]) / 2;
+
+                    board[rowMoves[i]][colMoves[i + 1]] = board[rowMoves[i]][colMoves[i]];
+                    board[rowMoves[i]][colMoves[i]] = ".";
+                    board[rowMoves[i] ][colMoves[i] + indxBetween] = ".";    
+                }
             }
         }
+
+        // if all of the moves are legal, make the moves and return new board state
+        board = testBoard;
+        // for (int i = 0; i < rowMoves.length - 1; i++) {
+        //     // execute the moves here 
+        //     if (moveVertically) {
+        //         int indxBetween = (rowMoves[i + 1] - rowMoves[i]) / 2;
+
+        //         board[rowMoves[i + 1]][colMoves[i ]] = board[rowMoves[i]][colMoves[i]];
+        //         board[rowMoves[i] + indxBetween][colMoves[i]] = ".";
+        //         board[rowMoves[i]][colMoves[i]] = ".";    
+        //     } else {
+        //         int indxBetween = (colMoves[i + 1] - colMoves[i]) / 2;
+
+        //         board[rowMoves[i]][colMoves[i + 1]] = board[rowMoves[i]][colMoves[i]];
+        //         board[rowMoves[i]][colMoves[i]] = ".";
+        //         board[rowMoves[i] ][colMoves[i] + indxBetween] = ".";    
+        //     }
+        // }
         return true;
     }
 
@@ -145,13 +174,16 @@ public class Board {
      */
     public void printBoard() {
         for (int i = 0; i < 9; i++) {
+
+            if (i == 1) System.out.println();
+
             for (int j = 0; j < 9; j++) {
                 System.out.print(this.board[i][j] + " ");
-                if (j == 8) {
-                    System.out.println();
-                }
+
+                if (j == 0) {System.out.print(" ");}
+                if (j == 8) {System.out.println();}
             }
         }
-        System.out.println(); // extra new line for it to look nice (imo)
+        System.out.println();
     }
 }
