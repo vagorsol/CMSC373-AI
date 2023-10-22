@@ -6,14 +6,16 @@ public class Konane {
 
         Board board = new Board();
         
-        board.printBoard();
+        // board.printBoard();
 
         board.board[4][4] = ".";
         board.board[2][4] = ".";
+        // board.board[4][2] = ".";
+        // board.board[4][4] = ".";
         board.printBoard();
-        int[] rowMoves = {6, 4, 2};
-        int[] colMoves = {4, 4, 4};
-        ArrayList<int[][]> moves = board.allLegalMoves("X");
+        // int[] rowMoves = {6, 4, 2};
+        // int[] colMoves = {4, 4, 4};
+        ArrayList<int[][]> moves = board.allLegalMoves("O");
 
         // if(board.movePiece(rowMoves, colMoves)) {
         //     board.printBoard();
@@ -22,19 +24,26 @@ public class Konane {
         // }
 
         // ArrayList<int[][]> moves = board.allLegalMoves("X"); // this seems to update the board..
-        System.out.println(moves.size());
+        // System.out.println(moves.size());
         for (int i = 0; i < moves.size(); i++) {
+            // MoveSequence temp = moves.get(i);
+            // int[] 
+            // System.out.println(temp);
             int[][] temp = moves.get(i);
-            for(int j = 0; j < temp.length; j++) {
-                for(int k = 0; k < temp[j].length; k++) {
-                    System.out.print(temp[j][k]); // will have to index by k/v - maybe should be hash but int[]?? can figure this later kinda done for today tbh
-                }
+            int[] row = temp[0];
+            int[] col = temp[1];
+            // int[] row = temp.getRowMoves();
+            // int[] col = temp.getColMoves();
+            for(int j = 0; j < row.length; j++) {
+                System.out.print("<" + row[j] + " " + col[j] + "> ");
+                // for(int k = 0; k < temp[j].length; k++) {
+                //     System.out.print(temp[j][k]); // will have to index by k/v - maybe should be hash but int[]?? can figure this later kinda done for today tbh
+                // }
                 System.out.print(" ");
             }
             System.out.println();
         }
         // should have (6, 4)
-
 
         // board.printBoard();
         /*
