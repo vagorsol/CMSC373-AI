@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 public class Board {
     public String[][] board;
-    private int legalMoves;
+    private int legalMoves; // ? where to update...
 
     public Board(){
         // create and innit a new board
@@ -159,10 +159,8 @@ public class Board {
      * probably make it private later but. make some kind of list (ArrayList?) of all the legal moves, and then pick one from it
      * @param side - the side (X or O) for whom all legal moves should be found for
      */
-    public ArrayList<int[][]> allLegalMoves(String side) {
+    private ArrayList<int[][]> allLegalMoves(String side) {
         String[][] saveState = copy(board);
-        // Board testBoard = new Board(board); 
-        // ArrayList<MoveSequence> moveSeq = new ArrayList<>();
 
         ArrayList<int[][]> allMoves = new ArrayList<int[][]>();
 
@@ -171,53 +169,39 @@ public class Board {
                 if (!board[i][j].equals(side)) {
                     continue;
                 }
-                // System.out.println("(" + i + ", " + j + ")");
                 ArrayList<Integer> rowMoves, colMoves;
                 
                 // check all vertical moves
                 for (int k = -2; k <= 2; k += 4) {
                     board = copy(saveState);
-                    // MoveSequence currMoves = new MoveSequence();
 
                     rowMoves = new ArrayList<>();
                     colMoves = new ArrayList<>();
-                    rowMoves.add(i);
-                    colMoves.add(j);
-                    
+                            
                     int index = k;
 
+                    // add first point
+                    rowMoves.add(i);
+                    colMoves.add(j);
 
                     // add second point
                     rowMoves.add(i);
                     colMoves.add(j + index);
-                    // if (k < 0) {
-                    //     colMoves.add(j - 2);
-                    //     // currMoves.add(i, j - 2);
-                    // } else {
-                    //     colMoves.add(j + 2);
-                    //     // currMoves.add(i, j + 2);
-                    // }
                     
                     while (true) {
                         int[] arrRowMoves = toArray(rowMoves);
                         int[] arrColMoves = toArray(colMoves);
-                        // int[] arrRowMoves = currMoves.getRowMoves();
-                        // int[] arrColMoves = currMoves.getColMoves();
                        
                         if (movePiece(arrRowMoves, arrColMoves)) {
-                            // moveSeq.add(currMoves); 
                             index += k;
-                            // currMoves.add(i, j + index);
                             int[][] toAdd ={arrRowMoves, arrColMoves};
+
                             allMoves.add(toAdd);
                             rowMoves.add(i);
                             colMoves.add(j + index);
                             
-                            board = copy(saveState); // have to reset the board every time...
-                            // printBoard();
+                            board = copy(saveState); 
                         } else {
-                            // printArray(arrRowMoves);
-                            // printArray(arrColMoves);
                             break;
                         }
                     }
@@ -228,43 +212,30 @@ public class Board {
                     board = copy(saveState);
                     rowMoves = new ArrayList<>();
                     colMoves = new ArrayList<>();
+
+                    int index = k;
+
+                    // add first point
                     rowMoves.add(i);
                     colMoves.add(j);
-                    MoveSequence currMoves = new MoveSequence();
-                    currMoves.add(i, j);
-                    int index = k;
 
                     // add second point
                     rowMoves.add(i + index);
                     colMoves.add(j);
-                    // if (k < 0) {
-                    //     rowMoves.add(i - 2);
-                    //     // currMoves.add(i - 2, j);
-                    // } else {
-                    //     rowMoves.add(i + 2);
-                    //     // currMoves.add(i + 2, j);
-                    // }
 
                     while (true) {
                         int[] arrRowMoves = toArray(rowMoves);
                         int[] arrColMoves = toArray(colMoves);
-                        // int[] arrRowMoves = currMoves.getRowMoves();
-                        // int[] arrColMoves = currMoves.getColMoves();
 
                         if (movePiece(arrRowMoves, arrColMoves)) {
-                            // moveSeq.add(currMoves);
                             index += k;
-                            // currMoves.add(i + index, j);
-
                             int[][] toAdd ={arrRowMoves, arrColMoves};
 
                             allMoves.add(toAdd);
                             rowMoves.add(i + index);
                             colMoves.add(j);
                             
-                            // System.out.println();
                             board = copy(saveState);
-                            
                         } else {
                             break;
                         }
@@ -273,27 +244,18 @@ public class Board {
             } 
         }
        
-        // System.out.println("Test board");
-        // testBoard.printBoard();
-
-        // System.out.println("Save State");
-        // for (int i = 0; i < 9; i++) {
-
-        //     if (i == 1) System.out.println();
-
-        //     for (int j = 0; j < 9; j++) {
-        //         System.out.print(saveState[i][j] + " ");
-
-        //         if (j == 0) {System.out.print(" ");}
-        //         if (j == 8) {System.out.println();}
-        //     }
-        // }
-        // // System.out.println();
-        // printBoard();
         board = copy(saveState);
-        // printBoard();
         return allMoves;
-        // return allMoves;
+    }
+
+    /**
+     * 
+     * @param side that the computer is on (i.e., white or black)
+     */
+    public void makeMove(String side) {
+        ArrayList<int[][]> moves = allLegalMoves(side);
+        int index = (int) (Math.random() * moves.size());
+        movePiece(moves.get(index)[0], moves.get(index)[1]); // for now like this
     }
 
     /**
@@ -308,13 +270,6 @@ public class Board {
         }
         return retArr; 
     }
-
-    // private void printArray(int[] moves) {
-    //     for (int i = 0; i < moves.length; i++) {
-    //         System.out.print(moves[i]);
-    //     }
-    //     System.out.println();
-    // }
 
     /**
      * Takes a given board and copies it to a new object 
@@ -335,6 +290,20 @@ public class Board {
     }
 
     /**
+     * Checks to see if the game can be continued (i.e., if any moves can be made)
+     * @param side
+     * @return true iff the given side can make any legal moves
+     */
+    public boolean gameState(String side) {
+        ArrayList<int[][]> moves = allLegalMoves(side);
+
+        if(moves.isEmpty()) {
+            return false; 
+        }
+        return true;
+    }
+
+    /**
      * Given a board, print out its contents
      * @param board to print
      */
@@ -351,5 +320,36 @@ public class Board {
             }
         }
         System.out.println();
+    }
+
+   
+    public static void main(String args[]) {
+        Board board = new Board();
+    
+        board.board[4][4] = ".";
+        board.board[2][4] = ".";
+        board.printBoard();
+        // int[] rowMoves = {6, 4, 2};
+        // int[] colMoves = {4, 4, 4};
+        ArrayList<int[][]> moves = board.allLegalMoves("O");
+
+        // if(board.movePiece(rowMoves, colMoves)) {
+        //     board.printBoard();
+        // } else {
+        //     System.out.println("Illegal Move!");
+        // }
+
+        for (int i = 0; i < moves.size(); i++) {
+
+            int[][] temp = moves.get(i);
+            int[] row = temp[0];
+            int[] col = temp[1];
+
+            for(int j = 0; j < row.length; j++) {
+                System.out.print("<" + row[j] + " " + col[j] + "> ");
+                System.out.print(" ");
+            }
+            System.out.println();
+        }
     }
 }
