@@ -13,80 +13,9 @@ import java.util.Scanner;
  */
 
 public class Konane {
-
-    /**
-     * Gets the human player's inputted moves.
-     * @return player's inputted moves in the form of a 2D integer array
-     */
-    public int[][] getPlayerMove() {
-        ArrayList<Integer> rowMoves = new ArrayList<>();
-        ArrayList<Integer> colMoves = new ArrayList<>();
-
-        try (Scanner scanner = new Scanner(System.in)) {
-            System.out.println("Format moves as [x-coordinate] [y-coordinate]");
-            System.out.print("Move: ");
-            String input = scanner.nextLine();
-
-            while (true) {
-                if ((input.toLowerCase()).equals("e")) {
-                    break;
-                } else {
-                    String[] line = input.split(" ");
-
-                    if (line.length == 1 || line.length > 2) {
-                        System.out.println("Invalid input!");
-                    } else {
-                        int rowToAdd, colToAdd;
-
-                        try {
-                            rowToAdd = Integer.parseInt(line[0]);
-                            colToAdd = Integer.parseInt(line[1]);
-
-                            rowMoves.add(rowToAdd); 
-                            colMoves.add(colToAdd);
-                        } catch (NumberFormatException e) {
-                            System.out.println("Invalid input!");
-                        } catch (IndexOutOfBoundsException e) {
-                            System.out.println("Invalid input!");
-                        }
-                    }
-                    
-                    System.out.print("Move (E to finish input): ");
-                    input = scanner.nextLine();
-                }
-            }
-
-            // conversion
-            int[] rowArr = new int[rowMoves.size()];
-            int[] colArr = new int[colMoves.size()];
-
-            for (int i = 0; i < rowArr.length; i++) {
-                System.out.print(rowMoves.get(i));
-                System.out.println(" " + colMoves.get(i));
-                rowArr[i] = rowMoves.get(i);
-                colArr[i] = colMoves.get(i);
-            }
-
-            int[][] ret = {rowArr, colArr};
-            return ret;
-        }
-    }
-
     public static void main(String args[]) {
-        Konane game = new Konane();
         Board board = new Board();
-        
-        // getting player moves code (test)
-        // int[][] playerMoves = game.getPlayerMove();
-        // int[] row = playerMoves[0];
-        // int[] col = playerMoves[1];
 
-        // for(int j = 0; j < row.length; j++) {
-        //     System.out.print("<" + row[j] + " " + col[j] + "> ");
-        //     System.out.print(" ");            
-        // }
-        // System.out.println();
-        
         System.out.println("Who moves first? Player or computer? ");
 
         try (Scanner scanner = new Scanner(System.in)) {
@@ -94,7 +23,6 @@ public class Konane {
             String side = ""; // TODO: how to alternate sides
             String playerSide = "";
             String computerSide = "";
-
 
             String firstTurn = scanner.nextLine();
             if((firstTurn.toLowerCase()).equals("player")) {
@@ -114,10 +42,75 @@ public class Konane {
             // first turn stuff here
             while(board.gameState(side)) {
                 if (currPlayer.equals("player")) {
-                    
-                    
-                    // TODO: get player moves, check if they're legal, if not keep looping until they are legal
-                    
+                    int[] row, col;
+                    int repeat = 0;
+
+                    // getting player moves
+                    do {
+                        if (repeat > 0) {
+                            System.out.println("Illegal Moves! Please input legal moves");
+                        }
+                        ArrayList<Integer> rowMoves = new ArrayList<>();
+                        ArrayList<Integer> colMoves = new ArrayList<>();
+
+                        System.out.println("Format moves as [x-coordinate] [y-coordinate]");
+                        System.out.print("Move: ");  
+
+                        String input = scanner.nextLine();
+
+                        while (true) {
+                            if ((input.toLowerCase()).equals("e")) {
+                                break;
+                            } else {
+                                String[] line = input.split(" ");
+
+                                if (line.length == 1 || line.length > 2) {
+                                    System.out.println("Invalid input!");
+                                } else {
+                                    int rowToAdd, colToAdd;
+
+                                    try {
+                                        rowToAdd = Integer.parseInt(line[0]);
+                                        colToAdd = Integer.parseInt(line[1]);
+
+                                        rowMoves.add(rowToAdd); 
+                                        colMoves.add(colToAdd);
+                                    } catch (NumberFormatException e) {
+                                        System.out.println("Invalid input!");
+                                    } catch (IndexOutOfBoundsException e) {
+                                        System.out.println("Invalid input!");
+                                    }
+                                }
+                        
+                                System.out.print("Move (E to finish input): ");
+                                input = scanner.nextLine();
+                            }
+                        }
+
+                        // conversion
+                        int[] rowArr = new int[rowMoves.size()];
+                        int[] colArr = new int[colMoves.size()];
+
+                        for (int i = 0; i < rowArr.length; i++) {
+                            rowArr[i] = rowMoves.get(i);
+                            colArr[i] = colMoves.get(i);
+                        }
+
+                        int[][] playerMoves = {rowArr, colArr};
+                        row = playerMoves[0];
+                        col = playerMoves[1];
+                        repeat++;
+                    } while (!board.movePiece(row, col));
+
+                    // output player move
+                    System.out.print("moves ");
+                    for(int j = 0; j < row.length; j++) {
+                        System.out.print("<" + row[j] + " " + col[j] + "> ");
+                            if (j < row.length - 1) {
+                            System.out.print("to ");
+                        }       
+                    }
+                    System.out.println();
                     side = computerSide;
                 } else {
                     // computer turn
