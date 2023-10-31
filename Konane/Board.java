@@ -246,62 +246,65 @@ public class Board {
     }
 
     /**
-     * Given a side and a depth, conduct the miniMax algorithm for that side
+     * Given a side and a depth, conduct the miniMax algorithm (with alpha-beta pruning) for that side
      * @param boardState 
      * @param currSide - what side to conduct the miniMax search for
      * @param depth 
      * @param isMax - if the current itteration is "max" or "min"
      * @return current best move for the given side
      */
-    private Move miniMax(Board boardState, String currSide, int depth, boolean isMax) {
+    private Move miniMax(Board boardState, String currSide, int depth, boolean isMax, int alpha, int beta) {
         String oppSide = currSide.equals("O") ? "X" : "O";
-        Move retMove = new Move(); 
+        Move bestMove = new Move(); 
 
         // if reach max depth
         if (depth == 0) {
-            int[][] mv = new int[0][0];
-
             ArrayList<int[][]> moves = allLegalMoves(oppSide); 
-            retMove = new Move(-moves.size(), mv);
-            return retMove;
+            int bv = isMax ? -moves.size() : moves.size(); 
+
+            bestMove = new Move(bv, new int[0][0]);
+            return bestMove;
         }
 
         String[][] saveState = copyBoard(this.board);
         ArrayList<int[][]> moves = allLegalMoves(currSide);
 
         Move currMove;
-        int cbv;
 
         if (isMax) {
-            cbv = (int) -Double.POSITIVE_INFINITY;
-
             for (int i = 0; i < moves.size(); i++) {
                 boardState.movePiece(moves.get(i)[0], moves.get(i)[1]);
-                currMove = miniMax(boardState, currSide, depth - 1, false);
+                currMove = miniMax(boardState, currSide, depth - 1, false, alpha, beta);
+
                 this.board = copyBoard(saveState);
 
-                if (currMove.getVal() > cbv) {
-                    cbv = currMove.getVal(); 
-                    retMove = new Move(cbv, moves.get(i));
+                if (currMove.getVal() > alpha) {
+                    alpha = currMove.getVal(); 
+                    bestMove = new Move(alpha, moves.get(i));
+                } 
+                if (alpha >= beta) {
+                    return new Move(beta, bestMove.getMoves());
                 }
             }
 
-            return retMove;       
+            return new Move(alpha, bestMove.getMoves());       
         } else {
-            cbv = (int) Double.POSITIVE_INFINITY; 
-
             for (int i = 0; i < moves.size(); i++) {
                 boardState.movePiece(moves.get(i)[0], moves.get(i)[1]);
-                currMove = miniMax(boardState, currSide, depth - 1, true);
+                currMove = miniMax(boardState, currSide, depth - 1, true, alpha, beta);
+
                 this.board = copyBoard(saveState);
 
-                if (currMove.getVal() < cbv) {
-                    cbv = currMove.getVal(); 
-                    retMove = new Move(cbv, moves.get(i));
+                if (currMove.getVal() < beta) {
+                    beta = currMove.getVal(); 
+                    bestMove = new Move(beta, moves.get(i));
+                }
+                if (beta <= alpha) {
+                    return new Move(alpha, bestMove.getMoves()); 
                 }
             }
 
-            return retMove; 
+            return new Move(beta, bestMove.getMoves()); 
         }
     }
 
@@ -355,11 +358,25 @@ public class Board {
      * @param side that the computer is on (i.e., white or black)
      */
     public void makeMove(String side) {
-        // ArrayList<int[][]> moves = allLegalMoves(side);
+        int alpha = (int) -Double.POSITIVE_INFINITY;
+        int beta = (int) Double.POSITIVE_INFINITY;
+
         Board boardState = new Board(this.board);
-        Move move = miniMax(boardState, side, 0, true);
-        // int index = (int) (Math.random() * moves.size());
-        // movePiece(moves.get(index)[0], moves.get(index)[1]); // for now like this
+        Move move = miniMax(boardState, side, 1, true, alpha, beta);
+
+        int[] rowArr = move.rowMoves();
+        int[] colArr = move.colMoves();
+  
+        // also prints out the moves
+        System.out.print("moves ");
+        for(int i = 0; i < rowArr.length; i++) {
+            System.out.print("<" + rowArr[i] + ", " + colArr[i] + "> ");
+            if (i < rowArr.length - 1) {
+                System.out.print("to ");
+            }
+        }
+        System.out.println();
+
         movePiece(move.rowMoves(), move.colMoves());
     }
 
@@ -411,33 +428,38 @@ public class Board {
         //     System.out.println();
         // }
 
-        Move p1 = board.miniMax(board, "X", 1, true);
-        System.out.println("best value: " + p1.getVal());
+        // int alpha = (int) -Double.POSITIVE_INFINITY;
+        // int beta = (int) Double.POSITIVE_INFINITY;
+
+        // Move p1 = board.miniMax(board, "X", 1, true, alpha, beta);
+        // System.out.println("best value: " + p1.getVal());
         
-        // int[][] p1Moves = p1.getMoves();
-        int[] p1Row = p1.rowMoves();
-        int[] p1Col = p1.colMoves();
-        // System.out.println(p1Moves.length);
+        // // int[][] p1Moves = p1.getMoves();
+        // int[] p1Row = p1.rowMoves();
+        // int[] p1Col = p1.colMoves();
+        // // System.out.println(p1Moves.length);
 
-        for(int i = 0; i < p1Row.length; i++) {
-            System.out.print("<" + p1Row[i] + " " + p1Col[i] + "> ");
-            System.out.print(" ");
-        }
-        System.out.println();
+        // for(int i = 0; i < p1Row.length; i++) {
+        //     System.out.print("<" + p1Row[i] + " " + p1Col[i] + "> ");
+        //     System.out.print(" ");
+        // }
+        // System.out.println();
 
-        Move p2 = board.miniMax(board, "X", 2, true);
-        System.out.println("best value: " + p2.getVal());
+        // Move p2 = board.miniMax(board, "X", 2, true, alpha, beta);
+        // System.out.println("best value: " + p2.getVal());
 
-        // int[][] p2Moves = p2.getMoves();
-        int[] p2Row = p2.rowMoves();
-        int[] p2Col = p2.colMoves();
-        // System.out.println(p2Moves.length);
+        // // int[][] p2Moves = p2.getMoves();
+        // int[] p2Row = p2.rowMoves();
+        // int[] p2Col = p2.colMoves();
+        // // System.out.println(p2Moves.length);
 
-        for(int i = 0; i < p2Row.length; i++) {
-            System.out.print("<" + p2Row[i] + " " + p2Col[i] + "> ");
-            System.out.print(" ");
-        }
-        System.out.println();
+        // for(int i = 0; i < p2Row.length; i++) {
+        //     System.out.print("<" + p2Row[i] + " " + p2Col[i] + "> ");
+        //     System.out.print(" ");
+        // }
+        // System.out.println();
+        
+        board.makeMove("X");
         board.printBoard();
     }
 }
