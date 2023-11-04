@@ -405,59 +405,6 @@ public class Board {
         board.board[4][4] = ".";
         board.board[4][6] = ".";
         board.printBoard();
-        // int[] rowMoves = {6, 4, 2};
-        // int[] colMoves = {4, 4, 4};
-        // ArrayList<int[][]> moves = board.allLegalMoves("X");
-
-        // if(board.movePiece(rowMoves, colMoves)) {
-        //     board.printBoard();
-        // } else {
-        //     System.out.println("Illegal Move!");
-        // }
-
-        // for (int i = 0; i < moves.size(); i++) {
-
-        //     int[][] temp = moves.get(i);
-        //     int[] row = temp[0];
-        //     int[] col = temp[1];
-
-        //     for(int j = 0; j < row.length; j++) {
-        //         System.out.print("<" + row[j] + " " + col[j] + "> ");
-        //         System.out.print(" ");
-        //     }
-        //     System.out.println();
-        // }
-
-        // int alpha = (int) -Double.POSITIVE_INFINITY;
-        // int beta = (int) Double.POSITIVE_INFINITY;
-
-        // Move p1 = board.miniMax(board, "X", 1, true, alpha, beta);
-        // System.out.println("best value: " + p1.getVal());
-        
-        // // int[][] p1Moves = p1.getMoves();
-        // int[] p1Row = p1.rowMoves();
-        // int[] p1Col = p1.colMoves();
-        // // System.out.println(p1Moves.length);
-
-        // for(int i = 0; i < p1Row.length; i++) {
-        //     System.out.print("<" + p1Row[i] + " " + p1Col[i] + "> ");
-        //     System.out.print(" ");
-        // }
-        // System.out.println();
-
-        // Move p2 = board.miniMax(board, "X", 2, true, alpha, beta);
-        // System.out.println("best value: " + p2.getVal());
-
-        // // int[][] p2Moves = p2.getMoves();
-        // int[] p2Row = p2.rowMoves();
-        // int[] p2Col = p2.colMoves();
-        // // System.out.println(p2Moves.length);
-
-        // for(int i = 0; i < p2Row.length; i++) {
-        //     System.out.print("<" + p2Row[i] + " " + p2Col[i] + "> ");
-        //     System.out.print(" ");
-        // }
-        // System.out.println();
         
         board.makeMove("X");
         board.printBoard();

@@ -1,26 +1,17 @@
 import java.util.ArrayList;
 import java.util.Scanner;
-/*
- * TODO: 
- *      "player moving: computer / player" to start, and naturally does opposite from there
- *          * how keep track / determine move order?
- *      repeat player / computer turns win condition is had
- *          * if at start of player's turn, all valid moves = 0, declare the other player the victor.
- * Computer turn:
- *      * move input & check that is valid
- *          * first, find all valid moves & randomly pick a move to do. 
- *      * min/max the value is how many viable move option the player has vs how many viable move options the computer has
- */
 
 public class Konane {
     public static void main(String args[]) {
         Board board = new Board();
+        board.board[4][4] = ".";
+        board.board[4][5] = ".";
 
         System.out.println("Who moves first? Player or computer? ");
+        String currPlayer = "";
 
         try (Scanner scanner = new Scanner(System.in)) {
-            String currPlayer = "";
-            String side = ""; // TODO: how to alternate sides
+            String side = "";
             String playerSide = "";
             String computerSide = "";
 
@@ -28,18 +19,17 @@ public class Konane {
             if((firstTurn.toLowerCase()).equals("player")) {
                 currPlayer = "player";
                 playerSide = "X";
-                side = playerSide;
                 computerSide = "O";
+                side = playerSide;
             } else if((firstTurn.toLowerCase()).equals("computer")) {
                 currPlayer = "computer";
                 playerSide = "O";
-                side = computerSide;
                 computerSide = "X";
+                side = computerSide;
             } else {
                 System.out.println("Invalid input.");
             }
 
-            // first turn stuff here
             while(board.gameState(side)) {
                 if (currPlayer.equals("player")) {
                     int[] row, col;
@@ -50,6 +40,7 @@ public class Konane {
                         if (repeat > 0) {
                             System.out.println("Illegal Moves! Please input legal moves");
                         }
+                        
                         ArrayList<Integer> rowMoves = new ArrayList<>();
                         ArrayList<Integer> colMoves = new ArrayList<>();
 
@@ -112,18 +103,20 @@ public class Konane {
                     }
                     System.out.println();
                     side = computerSide;
+                    currPlayer = "computer";
                 } else {
                     // computer turn
                     board.makeMove(computerSide);
                     side = playerSide;
+                    currPlayer = "player";
                 }
+
+                board.printBoard();
             }
-            /*
-             * starting move: <8, 8>, <1, 1>, <5, 5>, <4,4>
-             * make function to read input and convert to coordinates
-             * how to get input? [xcoor ycoor] [xcoor ycoor] [input by enter]
-             * print out as "moves <x, y> to <x, y> to <x, y>" etc ad nauseum
-             */
         }
+        
+        board.printBoard();
+        String winner = currPlayer.equals("player") ? "Computer" : "Player";
+        System.out.println(winner + " wins!");
     }
 }
