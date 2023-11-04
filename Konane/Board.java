@@ -362,7 +362,7 @@ public class Board {
         int beta = (int) Double.POSITIVE_INFINITY;
 
         Board boardState = new Board(this.board);
-        Move move = miniMax(boardState, side, 1, true, alpha, beta);
+        Move move = miniMax(boardState, side, 6, true, alpha, beta);
 
         int[] rowArr = move.rowMoves();
         int[] colArr = move.colMoves();

@@ -30,6 +30,7 @@ public class Konane {
                 System.out.println("Invalid input.");
             }
 
+            board.printBoard();
             while(board.gameState(side)) {
                 if (currPlayer.equals("player")) {
                     int[] row, col;
@@ -44,8 +45,8 @@ public class Konane {
                         ArrayList<Integer> rowMoves = new ArrayList<>();
                         ArrayList<Integer> colMoves = new ArrayList<>();
 
-                        System.out.println("Format moves as [x-coordinate] [y-coordinate]");
-                        System.out.print("Move: ");  
+                        System.out.println("Your side: " + playerSide + "\nFormat moves as: x-coordinate y-coordinate");
+                        System.out.print("Start Position: ");  
 
                         String input = scanner.nextLine();
 
@@ -73,7 +74,7 @@ public class Konane {
                                     }
                                 }
                         
-                                System.out.print("Move (E to finish input): ");
+                                System.out.print("Moves To (E to finish giving inputs): ");
                                 input = scanner.nextLine();
                             }
                         }
@@ -106,6 +107,7 @@ public class Konane {
                     currPlayer = "computer";
                 } else {
                     // computer turn
+                    System.out.println("Computer side: " + computerSide);
                     board.makeMove(computerSide);
                     side = playerSide;
                     currPlayer = "player";
